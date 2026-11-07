@@ -1,0 +1,44 @@
+[build-system]
+requires = ["hatchling>=1.21"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ragbench"
+version = "0.1.0"
+description = "Rigorous evaluation of RAG configurations and LLMs: retrieval precision/recall, context relevance, faithfulness, correctness, latency and cost, with confidence intervals and significance tests."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "tzmahony" }]
+dependencies = ["numpy>=1.24", "pyyaml>=6.0"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+[project.optional-dependencies]
+anthropic = ["anthropic>=0.70"]
+openai = ["openai>=1.40"]
+embeddings = ["sentence-transformers>=2.7"]
+all = ["anthropic>=0.70", "openai>=1.40", "sentence-transformers>=2.7"]
+dev = ["pytest>=8", "ruff>=0.5"]
+
+[project.scripts]
+ragbench = "ragbench.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ragbench"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+src = ["src"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501", "B905"]

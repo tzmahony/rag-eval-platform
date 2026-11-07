@@ -1,0 +1,38 @@
+# Real models. Requires `pip install 'ragbench[anthropic]'` and Anthropic credentials.
+# Cost guardrail: start with `ragbench run examples/configs/claude.yaml --limit 5`.
+name: claude-models
+description: Claude model tiers and effort levels on the same two retrieval setups, graded by an LLM judge.
+corpus: ../corpus
+dataset: ../dataset.jsonl
+seed: 7
+concurrency: 4
+judge:
+  type: llm
+  # Use a different model from those under test to limit self-preference bias.
+  model: anthropic:claude-sonnet-5-5
+  params: {effort: low}
+
+rag:
+  - name: bm25-sent3-k4
+    chunker: {type: sentence, size: 3, overlap: 1}
+    retriever: {type: bm25}
+    k: 4
+  - name: hybrid-sent3-k6
+    chunker: {type: sentence, size: 3, overlap: 1}
+    retriever:
+      type: hybrid
+      retrievers: [{type: bm25}, {type: lsa, dim: 48}]
+    k: 6
+
+llms:
+  - id: anthropic:claude-opus-5-5
+    name: opus-5.5-medium
+    params: {effort: medium, max_tokens: 4096}
+  - id: anthropic:claude-opus-5-5
+    name: opus-5.5-low
+    params: {effort: low, max_tokens: 4096}
+  - id: anthropic:claude-haiku-5-5
+    name: haiku-5.5
+    params: {max_tokens: 4096}
+
+baseline: bm25-sent3-k4 / opus-5.5-medium

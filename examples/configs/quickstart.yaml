@@ -1,0 +1,44 @@
+# Fully offline: deterministic mock models + heuristic judge. No API keys, runs in seconds.
+name: quickstart
+description: >
+  Compares four retrieval setups across three offline mock models on the Kestrel Labs
+  handbook. Use it to learn the workflow; swap in real models with claude.yaml / openai.yaml.
+corpus: ../corpus
+dataset: ../dataset.jsonl
+output_dir: runs
+seed: 7
+concurrency: 8
+judge:
+  type: heuristic
+
+rag:
+  - name: bm25-sent3-k4
+    chunker: {type: sentence, size: 3, overlap: 1}
+    retriever: {type: bm25}
+    k: 4
+  - name: bm25-doc-k2
+    chunker: {type: document}
+    retriever: {type: bm25}
+    k: 2
+  - name: tfidf-sent2-k2
+    chunker: {type: sentence, size: 2, overlap: 0}
+    retriever: {type: tfidf}
+    k: 2
+  - name: lsa-fixed60-k4
+    chunker: {type: fixed, size: 60, overlap: 15}
+    retriever: {type: lsa, dim: 48}
+    k: 4
+  - name: hybrid-sent3-k4
+    chunker: {type: sentence, size: 3, overlap: 1}
+    retriever:
+      type: hybrid
+      retrievers: [{type: bm25}, {type: lsa, dim: 48}]
+      weights: [1.0, 0.7]
+    k: 4
+
+llms:
+  - mock:extractive
+  - mock:verbose
+  - mock:hallucinating
+
+baseline: bm25-sent3-k4 / mock:extractive

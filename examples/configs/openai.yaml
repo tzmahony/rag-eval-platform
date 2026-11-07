@@ -1,0 +1,26 @@
+# Requires `pip install 'ragbench[openai]'` and OPENAI_API_KEY. Verify pricing before publishing results.
+name: openai-models
+corpus: ../corpus
+dataset: ../dataset.jsonl
+seed: 7
+judge:
+  type: llm
+  model: openai:gpt-4.1
+  params: {temperature: 0}
+rag:
+  - name: bm25-sent3-k4
+    chunker: {type: sentence, size: 3, overlap: 1}
+    retriever: {type: bm25}
+    k: 4
+  - name: openai-embed-k4
+    chunker: {type: sentence, size: 3, overlap: 1}
+    retriever: {type: dense, embedder: {type: openai, model: text-embedding-3-small}}
+    k: 4
+llms:
+  - id: openai:gpt-4.1-mini
+    params: {temperature: 0}
+  - id: openai:gpt-4o-mini
+    params: {temperature: 0}
+# Override or add prices (USD per 1M tokens):
+# pricing:
+#   openai:gpt-4.1-mini: {input: 0.40, output: 1.60}
